@@ -70,6 +70,18 @@ p {
   padding-bottom: 24px;
 }
 
+.topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.topbar__logo {
+  display: block;
+  width: min(188px, 40vw);
+  height: auto;
+}
+
 .topbar__actions {
   display: flex;
   align-items: center;
@@ -395,6 +407,10 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 720px) {
   .page-shell {
     padding: 16px;
+  }
+
+  .topbar__logo {
+    width: min(164px, 48vw);
   }
 
   .topbar,
