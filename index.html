@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A minimal GitHub Pages experiment for Team1 Turkey that visualizes the Avalanche safety bound as a live line chart."
+    />
+    <meta name="theme-color" content="#121212" />
+    <title>Avalanche Safety Bound Lab</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23121212'/%3E%3Cpath d='M16 40.5 32 20l16 20.5h-9.8L32 32.6l-6.2 7.9Z' fill='%23fafafa'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <span>Team1 Turkey</span>
+        <div class="topbar__actions">
+          <div class="lang-switch" role="group" aria-label="Language selector">
+            <button type="button" class="lang-switch__button is-active" data-lang="en">
+              EN
+            </button>
+            <button type="button" class="lang-switch__button" data-lang="tr">
+              TR
+            </button>
+          </div>
+          <a
+            id="docs-link"
+            href="https://build.avax.network/docs/nodes/architecture/consensus"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Official docs
+          </a>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel--controls">
+          <div class="panel__intro">
+            <p class="eyebrow" id="panel-eyebrow">Avalanche Safety Bound Lab</p>
+            <h1 id="panel-title">Live parameters. One line chart.</h1>
+            <p class="formula">
+              P(safety violation) &lt; (1 - α<sub>c</sub> / k)<sup>β</sup>
+            </p>
+          </div>
+
+          <div class="control-stack">
+            <article class="control-card">
+              <div class="control-card__head">
+                <label for="k-range" class="control-card__label" id="k-label">
+                  k <span>(sample size)</span>
+                </label>
+                <output id="k-value" for="k-range">20</output>
+              </div>
+              <input id="k-range" type="range" min="5" max="40" value="20" />
+              <div class="control-card__scale">
+                <span>5</span>
+                <span>40</span>
+              </div>
+            </article>
+
+            <article class="control-card">
+              <div class="control-card__head">
+                <label
+                  for="alpha-confidence-range"
+                  class="control-card__label"
+                  id="alpha-confidence-label"
+                >
+                  α<sub>c</sub> <span>(confidence threshold)</span>
+                </label>
+                <output id="alpha-confidence-value" for="alpha-confidence-range">15</output>
+              </div>
+              <input
+                id="alpha-confidence-range"
+                type="range"
+                min="1"
+                max="20"
+                value="15"
+              />
+              <div class="control-card__scale">
+                <span>1</span>
+                <span id="alpha-confidence-max">20</span>
+              </div>
+            </article>
+
+            <article class="control-card">
+              <div class="control-card__head">
+                <label for="beta-range" class="control-card__label" id="beta-label">
+                  β <span>(finality rounds)</span>
+                </label>
+                <output id="beta-value" for="beta-range">20</output>
+              </div>
+              <input id="beta-range" type="range" min="1" max="60" value="20" />
+              <div class="control-card__scale">
+                <span>1</span>
+                <span>60</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="stat-grid">
+            <article class="stat-card">
+              <span id="bound-label">Current bound</span>
+              <strong id="probability-value">9.54 × 10^-13</strong>
+            </article>
+            <article class="stat-card">
+              <span id="ratio-label">α<sub>c</sub> / k</span>
+              <strong id="ratio-value">75.0%</strong>
+            </article>
+            <article class="stat-card">
+              <span id="base-label">1 - α<sub>c</sub> / k</span>
+              <strong id="base-value">0.25</strong>
+            </article>
+            <article class="stat-card" id="safety-reading-card">
+              <span id="safety-reading-label">Safety reading</span>
+              <strong id="safety-reading-value">Stronger</strong>
+              <p class="stat-note" id="safety-reading-note">Indicative, not absolute.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel panel--chart">
+          <div class="chart-head">
+            <div>
+              <p class="eyebrow" id="chart-eyebrow">Safety curve</p>
+              <h2 id="chart-title">Upper bound across β</h2>
+            </div>
+            <div class="bound-pill" id="bound-pill">
+              β = 20 · 9.54 × 10^-13
+            </div>
+          </div>
+
+          <div class="chart-surface">
+            <svg
+              id="safety-chart"
+              viewBox="0 0 760 400"
+              role="img"
+              aria-label="Line chart showing the Avalanche safety upper bound across beta values"
+            >
+              <g id="chart-grid"></g>
+              <g id="chart-y-labels"></g>
+              <g id="chart-x-labels"></g>
+              <path id="chart-area" class="chart-area"></path>
+              <path id="chart-line" class="chart-line"></path>
+              <line id="chart-crosshair-x" class="chart-crosshair"></line>
+              <line id="chart-crosshair-y" class="chart-crosshair"></line>
+              <circle id="chart-marker" class="chart-marker" r="7"></circle>
+              <text id="chart-marker-label" class="chart-marker-label"></text>
+            </svg>
+          </div>
+
+          <div class="chart-footer">
+            <p id="formula-substitution">
+              P &lt; (1 - 15 / 20)^20 ≈ 9.54 × 10^-13
+            </p>
+            <p id="scale-caption">Log scale: 10^0 to 10^-12</p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footnote" id="footnote">
+        This playground shows how sample size, confidence threshold, and repeated
+        successful rounds reshape Avalanche&apos;s official safety upper bound.
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
